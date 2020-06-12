@@ -1,4 +1,4 @@
-SAMPLEs = ["iris", "pbmc3k_2000hvg", "pbmc3k_500hvg", "pbmc3k_100hvg", "pbmc3k_50hvg"]
+SAMPLEs = ["..."]
 DEGs = ["wilcoxon", "edger", "mast"]
 
 #
