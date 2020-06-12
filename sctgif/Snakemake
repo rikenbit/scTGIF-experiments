@@ -1,0 +1,29 @@
+from snakemake.utils import min_version
+
+#
+# Setting
+#
+min_version("5.8.1")
+configfile: "config.yaml"
+
+SAMPLEs = glob_wildcards("../datasets/data/{sample}.RData").sample
+DEGs = ["wilcoxon", "edger", "mast"]
+
+rule all:
+    expand('output/{sample}/sctgif.RData',
+    	sample=SAMPLEs)
+
+rule sctgif_sctgif:
+    input:
+        '../datasets/data/{sample}.csv'
+    output:
+        touch('output/{sample}/sctgif.RData')
+    wildcard_constraints:
+        sample='|'.join([re.escape(x) for x in SAMPLEs])
+    benchmark:
+        'benchmarks/sctgif_{sample}_{k}.txt'
+    log:
+        'logs/sctgif_{sample}_{k}.log'
+    shell:
+        'src/sctgif.sh {input} {output} >& {log}'
+

@@ -1,0 +1,28 @@
+from snakemake.utils import min_version
+
+#
+# Setting
+#
+min_version("5.8.1")
+configfile: "config.yaml"
+
+SAMPLEs = ["..."]
+EXTs = [".RData", ".csv"]
+
+rule all:
+    input:
+        expand('data/{sample}{ext}',
+            sample=SAMPLEs, ext=EXTs)
+
+rule preprocess:
+    output:
+        out1=touch('data/{sample}.RData'),
+        out2=touch('data/{sample}.csv')
+    wildcard_constraints:
+        sample='|'.join([re.escape(x) for x in SAMPLEs])
+    benchmark:
+        'benchmarks/preprocess_{sample}.txt'
+    log:
+        'logs/preprocess_{sample}.log'
+    shell:
+        'src/preprocess_{wildcards.sample}.sh >& {log}'

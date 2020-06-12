@@ -1,0 +1,29 @@
+from snakemake.utils import min_version
+
+#
+# Setting
+#
+min_version("5.8.1")
+configfile: "config.yaml"
+
+SAMPLEs = glob_wildcards("../datasets/data/{sample}.RData").sample
+DEGs = ["wilcoxon", "edger", "mast"]
+
+rule all:
+        expand('output/{sample}/{deg}.RData',
+        	sample=SAMPLEs, deg=DEGs)
+
+rule deg_deg:
+    input:
+        '../datasets/data/{sample}.csv'
+    output:
+        touch('output/{sample}/{deg}.RData')
+    wildcard_constraints:
+        sample='|'.join([re.escape(x) for x in SAMPLEs]),
+        deg='|'.join([re.escape(x) for x in DEGs])
+    benchmark:
+        'benchmarks/{deg}_{sample}_{k}.txt'
+    log:
+        'logs/{deg}_{sample}_{k}.log'
+    shell:
+        'src/{wildcards.deg}.sh {input} {output} >& {log}'
